@@ -1,0 +1,103 @@
+#!/usr/bin/env node
+
+/**
+ * Load config file.
+ */
+
+var config = require('./config');
+
+/**
+ * Module dependencies.
+ */
+
+var http = require('http');
+var fs = require('fs');
+
+/**
+ * Start the server.
+ */
+
+var app;
+var server;
+var port;
+var logger;
+
+/*
+ * Create the app
+ */
+
+var temp = require('./app')();
+app = temp[0];
+logger = temp[1];
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+port = config.server.port
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+server = http.createServer(app);
+logger.info('HTTP server listening on port %s', port);
+
+console.log('========================================');
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string' ?
+        'Pipe ' + port :
+        'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            logger.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            logger.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
