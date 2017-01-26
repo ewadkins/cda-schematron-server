@@ -43,7 +43,7 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
             }
         }
     }
-    // Determine whether the test has a predict or IS a predicate
+    // Determine whether the test has a predicate or IS a predicate
     if (/^[^\[\]]+(\[.+\])+$/.test(test) && !falsePositive) { // has predicate(s), acts as a selector
         // Extract predicate and base element
         var matches = /^[^\[\]]+(\[.+\])+$/.exec(test);
