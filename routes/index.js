@@ -1,3 +1,4 @@
+// jshint node:true
 var fs = require('fs');
 var express = require('express');
 var router = express.Router();
@@ -13,8 +14,9 @@ var schematronXml = fs.readFileSync(path.join(config.server.appDirectory,
 
 module.exports = function(logger){
 
-	router.post('/', function(req, res, next) {
+	router.post('/', function(req, res) {
         var xml = req.body.toString();
+        logger.info('Validating.. (size: ' + xml.length + ')');
         
         var resourceDirectory = path.join(config.server.appDirectory, config.validator.baseDirectory); // Where to look for resource files
         var xmlSnippetMaxLength = config.validator.xmlSnippetMaxLength;
@@ -25,4 +27,4 @@ module.exports = function(logger){
 	});
 	
 	return router;
-}
+};

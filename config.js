@@ -1,3 +1,4 @@
+// jshint node:true
 var config = {
     server: {
         port: 8080,
@@ -11,6 +12,6 @@ var config = {
         
         xmlSnippetMaxLength: 200 // set to 0 for no max length
     }
-}
+};
 
 module.exports = config;

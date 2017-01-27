@@ -1,3 +1,4 @@
+// jshint node:true
 var config = require('./config');
 var express = require('express');
 var path = require('path');
@@ -46,6 +47,13 @@ function create() {
 
     // Set up data pipeline
     app.use(bodyParser.raw({ type: '*/*', limit: '50mb' }));
+    
+    // Log incoming requests
+    app.use(function(req, res, next) {
+        logger.info(((req.headers['x-forwarded-for'] || '').split(',')[0] 
+        || req.connection.remoteAddress) + ' ' + req.method + ' ' + req.path);
+        next();
+    });
 	
 	// Configure paths
 	app.use('/', require(path.join(__dirname, config.server.routesDirectory, 'index'))(logger));
@@ -57,7 +65,7 @@ function create() {
 	  next(err);
 	});
 
-    app.use(function(err, req, res, next) {
+    app.use(function(err, req, res) {
     	if (!err.status) {
     		logger.error(err);
     		throw err;

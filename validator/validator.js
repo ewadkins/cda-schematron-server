@@ -1,3 +1,5 @@
+// jshint node:true
+// jshint shadow:true
 var fs = require('fs');
 var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
@@ -12,9 +14,6 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
     xmlSnippetMaxLength = xmlSnippetMaxLength || 200;
     
     // If not valid xml, might be file path
-    if (xml[0] !== '<') {
-        xml = fs.readFileSync(xml, 'utf-8').toString();
-    }
     if (schematron[0] !== '<') {
         schematron = fs.readFileSync(schematron, 'utf-8').toString();
     }
@@ -35,7 +34,6 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
     // Create selector object, initialized with namespaces
     var select = xpath.useNamespaces(namespaceMap);    
     
-    var results = [];
     var errors = [];
     var warnings = [];
     var ignored = [];
@@ -64,7 +62,7 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
                                 var result = results[k].result;
                                 var line = results[k].line;
                                 var path = results[k].path;
-                                var xml = results[k].xml;
+                                var xmlSnippet = results[k].xml;
                                 var modifiedTest = results[k].modifiedTest;
                                 if (!result) {
                                     var obj = {
@@ -78,8 +76,8 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
                                         ruleId: ruleId,
                                         assertionId: assertionId,
                                         context: context,
-                                        xml: xml
-                                    }
+                                        xml: xmlSnippet
+                                    };
                                     if (type === 'error') {
                                         errors.push(obj);
                                     }
@@ -99,7 +97,7 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
                                 ruleId: ruleId,
                                 assertionId: assertionId,
                                 context: context
-                            }
+                            };
                             ignored.push(obj);
                         }
                     }

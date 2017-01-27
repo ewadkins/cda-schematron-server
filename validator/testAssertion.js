@@ -1,3 +1,5 @@
+// jshint node:true
+// jshint shadow:true
 module.exports = testAssertion;
 
 var includeExternalDocument = require('./includeExternalDocument');
@@ -6,7 +8,7 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
     var results = [];
     
     // Determine the sections within context
-    var docs = [];
+    var selected = [];
     if (context) {
         if (context.indexOf('/')) {
             context = '//' + context;
@@ -18,7 +20,7 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
     }
     
     // Extract values from external document and modify test if a document call is made
-    originalTest = test;
+    var originalTest = test;
     try {
         test = includeExternalDocument(test, externalDir);
     }
@@ -29,7 +31,6 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
     // Check against non-regular expressions with mutually exclusive bracket groups
     var falsePositive = false;
     if (test.indexOf('[') > 0) {
-        var ind = test.indexOf('[');
         var bracketDepth = 0;
         for (var i = test.indexOf('['); i < test.length; i++) {
             if (!bracketDepth && test[i] !== '[') {
@@ -59,7 +60,7 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
                 for (var j = 0; j < elements.length; j++) {
                     // Test predicate on element
                     try {
-                        result = select('boolean(' + predicate + ')', elements[j]);
+                        var result = select('boolean(' + predicate + ')', elements[j]);
                         if (result) {
                             valid = result;
                             break;
@@ -131,9 +132,9 @@ function getXPath(node, path) {
         path = getXPath(node.parentNode, path);
     }
 
+    var count = 1;
     if (node.previousSibling) {
-        var count = 1;
-        var sibling = node.previousSibling
+        var sibling = node.previousSibling;
         do {
             if (sibling.nodeType === 1 && sibling.nodeName === node.nodeName) {
                 count++;
@@ -158,7 +159,7 @@ function getXPath(node, path) {
     }
 
     if (node.nodeType === 1) {
-        path.push(node.nodeName + ("[" + (count || 1) + "]"));
+        path.push(node.nodeName + ('[' + (count || 1) + ']'));
     }
     return top ? '/' + path.join('/') : path;
-};
+}

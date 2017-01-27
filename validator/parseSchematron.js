@@ -1,3 +1,5 @@
+// jshint node:true
+// jshint shadow:true
 module.exports = parseSchematron;
 
 var xpath = require('xpath');
@@ -18,7 +20,7 @@ function extract(doc) {
     //// Namespace mapping
     var namespaces = xpath.select('//*[local-name()="ns"]', doc);
     for (var i = 0; i < namespaces.length; i++) {
-        namespaceMap[namespaces[i].getAttribute('prefix')] = namespaces[i].getAttribute('uri')
+        namespaceMap[namespaces[i].getAttribute('prefix')] = namespaces[i].getAttribute('uri');
     }
     
     //// Pattern to level mapping
@@ -54,7 +56,7 @@ function extract(doc) {
     
     // Map patterns to rules
     for (var i = 0; i < patterns.length; i++) {
-        patternId = patterns[i].getAttribute('id');
+        var patternId = patterns[i].getAttribute('id');
         patternRuleMap[patternId] = [];
         var rules = xpath.select('./*[local-name()="rule"]', patterns[i]);
         for (var j = 0; j < rules.length; j++) {
@@ -63,7 +65,7 @@ function extract(doc) {
                 abstract: parseAbstract(rules[j].getAttribute('abstract')),
                 context: parseContext(rules[j].getAttribute('context')),
                 assertionsAndExtensions: getAssertionsAndExtensions(rules[j])
-            }
+            };
         }        
     }
     

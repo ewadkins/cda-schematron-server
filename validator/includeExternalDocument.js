@@ -1,3 +1,5 @@
+// jshint node:true
+// jshint shadow:true
 module.exports = modifyTest;
 
 var fs = require('fs');
