@@ -44,76 +44,27 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
             }
         }
     }
-    // Determine whether the test has a predicate or IS a predicate
-    if (/^[^\[\]]+(\[.+\])+$/.test(test) && !falsePositive) { // has predicate(s), acts as a selector
-        // Extract predicate and base element
-        var matches = /^[^\[\]]+(\[.+\])+$/.exec(test);
-        var predicate = matches[1].slice(1, -1).split('][').pop();
-        var base = test.slice(0, -(predicate.length + 2));
-
-        // For each section within context..
-        for (var i = 0; i < selected.length; i++) {
-            // For each element to test predicate on..
-            try {
-                var elements = select(base, selected[i]);
-                var valid = false;
-                for (var j = 0; j < elements.length; j++) {
-                    // Test predicate on element
-                    try {
-                        var result = select('boolean(' + predicate + ')', elements[j]);
-                        if (result) {
-                            valid = result;
-                            break;
-                        }
-                    }
-                    catch (err) {
-                        return { ignored: true, errorMessage: err.message };
-                    }
-                }
-                var lineNumber = null;
-                var xmlSnippet = null;
-                var modifiedTest = null;
-                if (selected[i].lineNumber) {
-                    lineNumber = selected[i].lineNumber;
-                    xmlSnippet = selected[i].toString();
-                }
-                if (xmlSnippet && xmlSnippet.length > (xmlSnippetMaxLength || 1e308)) {
-                    xmlSnippet = xmlSnippet.slice(0, (xmlSnippetMaxLength || 1e308)) + '...';
-                }
-                if (originalTest !== test) {
-                    modifiedTest = test;
-                }
-                results.push({ result: valid, line: lineNumber, path: getXPath(selected[i]), xml: xmlSnippet, modifiedTest: modifiedTest });
+    
+    for (var i = 0; i < selected.length; i++) {
+        try {
+            var result = select('boolean(' + test + ')', selected[i]);
+            var lineNumber = null;
+            var xmlSnippet = null;
+            var modifiedTest = null;
+            if (selected[i].lineNumber) {
+                lineNumber = selected[i].lineNumber;
+                xmlSnippet = selected[i].toString();
             }
-            catch (err) {
-                return { ignored: true, errorMessage: err.message };
+            if (xmlSnippet && xmlSnippet.length > (xmlSnippetMaxLength || 1e308)) {
+                xmlSnippet = xmlSnippet.slice(0, (xmlSnippetMaxLength || 1e308)) + '...';
             }
+            if (originalTest !== test) {
+                modifiedTest = test;
+            }
+            results.push({ result: result, line: lineNumber, path: getXPath(selected[i]), xml: xmlSnippet, modifiedTest: modifiedTest });
         }
-    }
-    else { // is a predicate, returns a boolean
-        // For each section within context..
-        for (var i = 0; i < selected.length; i++) {
-            // Test predicate
-            try {
-                var result = select('boolean(' + test + ')', selected[i]);
-                var lineNumber = null;
-                var xmlSnippet = null;
-                var modifiedTest = null;
-                if (selected[i].lineNumber) {
-                    lineNumber = selected[i].lineNumber;
-                    xmlSnippet = selected[i].toString();
-                }
-                if (xmlSnippet && xmlSnippet.length > (xmlSnippetMaxLength || 1e308)) {
-                    xmlSnippet = xmlSnippet.slice(0, (xmlSnippetMaxLength || 1e308)) + '...';
-                }
-                if (originalTest !== test) {
-                    modifiedTest = test;
-                }
-                results.push({ result: result, line: lineNumber, path: getXPath(selected[i]), xml: xmlSnippet, modifiedTest: modifiedTest });
-            }
-            catch (err) {
-                return { ignored: true, errorMessage: err.message };
-            }
+        catch (err) {
+            return { ignored: true, errorMessage: err.message };
         }
     }
     
