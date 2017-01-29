@@ -28,23 +28,6 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
         return { ignored: true, errorMessage: err.message };
     }
     
-    // Check against non-regular expressions with mutually exclusive bracket groups
-    var falsePositive = false;
-    if (test.indexOf('[') > 0) {
-        var bracketDepth = 0;
-        for (var i = test.indexOf('['); i < test.length; i++) {
-            if (!bracketDepth && test[i] !== '[') {
-                falsePositive = true;
-            }
-            if (test[i] === '[') {
-                bracketDepth++;
-            }
-            else if (test[i] === ']') {
-                bracketDepth--;
-            }
-        }
-    }
-    
     for (var i = 0; i < selected.length; i++) {
         try {
             var result = select('boolean(' + test + ')', selected[i]);
