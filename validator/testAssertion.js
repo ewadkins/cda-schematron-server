@@ -38,8 +38,9 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
                 lineNumber = selected[i].lineNumber;
                 xmlSnippet = selected[i].toString();
             }
-            if (xmlSnippet && xmlSnippet.length > (xmlSnippetMaxLength || 1e308)) {
-                xmlSnippet = xmlSnippet.slice(0, (xmlSnippetMaxLength || 1e308)) + '...';
+            var maxLength = (xmlSnippetMaxLength || 1e308);
+            if (xmlSnippet && xmlSnippet.length > maxLength) {
+                xmlSnippet = xmlSnippet.slice(0, maxLength) + '...';
             }
             if (originalTest !== test) {
                 modifiedTest = test;
@@ -59,7 +60,7 @@ function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMax
     return results;
 }
 
-function getXPath(node, path) {
+function getXPath(node, path) {    
     var top = !path ? true : false;
     path = path || [];
     if (node.parentNode) {

@@ -55,7 +55,7 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
                 if (!ruleAssertionMap[rules[i]].abstract) {
                     var ruleId = rules[i];
                     var context = ruleAssertionMap[rules[i]].context;
-                    var assertionResults = checkRule(rules[i]);                    
+                    var assertionResults = checkRule(rules[i]);    
                     for (var j = 0; j < assertionResults.length; j++) {
                         var type = assertionResults[j].type;
                         var assertionId = assertionResults[j].assertionId;
