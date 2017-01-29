@@ -8,9 +8,10 @@ var config = require('../config');
 var validator = require('../validator/validator');
 
 // Load schematron once at start
-var schematronXml = fs.readFileSync(path.join(config.server.appDirectory,
-                                              config.validator.baseDirectory,
-                                              config.validator.schematronFileName), 'utf-8');
+var schematronPath = path.join(config.server.appDirectory,
+                               config.validator.baseDirectory,
+                               config.validator.schematronFileName);
+var includeWarnings = config.validator.includeWarnings;
 
 module.exports = function(logger){
 
@@ -21,7 +22,7 @@ module.exports = function(logger){
         var resourceDirectory = path.join(config.server.appDirectory, config.validator.baseDirectory); // Where to look for resource files
         var xmlSnippetMaxLength = config.validator.xmlSnippetMaxLength;
         
-        var results = validator.validate(xml, schematronXml, resourceDirectory, xmlSnippetMaxLength);
+        var results = validator.validate(xml, schematronPath, includeWarnings, resourceDirectory, xmlSnippetMaxLength);
         
         res.json(results);
 	});

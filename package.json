@@ -12,9 +12,13 @@
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",
-    "jshint-stylish": "^2.2.1"
+    "grunt-mocha-test": "^0.13.2",
+    "jshint-stylish": "^2.2.1",
+    "mocha": "^3.2.0",
+    "supertest": "^2.0.1"
   },
   "scripts": {
     "start": "node startServer",

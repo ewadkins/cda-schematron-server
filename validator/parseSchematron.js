@@ -57,6 +57,7 @@ function extract(doc) {
     // Map patterns to rules
     for (var i = 0; i < patterns.length; i++) {
         var patternId = patterns[i].getAttribute('id');
+        var defaultLevel = patternLevelMap[patternId];
         patternRuleMap[patternId] = [];
         var rules = xpath.select('./*[local-name()="rule"]', patterns[i]);
         for (var j = 0; j < rules.length; j++) {
@@ -64,7 +65,7 @@ function extract(doc) {
             ruleAssertionMap[rules[j].getAttribute('id')] = {
                 abstract: parseAbstract(rules[j].getAttribute('abstract')),
                 context: parseContext(rules[j].getAttribute('context')),
-                assertionsAndExtensions: getAssertionsAndExtensions(rules[j])
+                assertionsAndExtensions: getAssertionsAndExtensions(rules[j], defaultLevel)
             };
         }        
     }
@@ -77,17 +78,24 @@ function extract(doc) {
     };
 }
 
-function getAssertionsAndExtensions(rule) {
+function getAssertionsAndExtensions(rule, defaultLevel) {
     var assertionsAndExtensions = [];
     
     // Find and store assertions
     var assertions = xpath.select('./*[local-name()="assert"]', rule);
     for (var i = 0; i < assertions.length; i++) {
+        var description = assertions[i].childNodes[0] ? assertions[i].childNodes[0].data : '';
+        var level = defaultLevel;
+        if (level === 'warning' && description.indexOf('SHALL') !== -1
+            && (description.indexOf('SHOULD') === -1 || description.indexOf('SHALL') < description.indexOf('SHOULD'))) {
+            level = 'error';
+        }
         assertionsAndExtensions.push({
             type: 'assertion',
+            level: level,
             id: assertions[i].getAttribute('id'),
             test: assertions[i].getAttribute('test'),
-            description: assertions[i].childNodes[0] ? assertions[i].childNodes[0].data : ''
+            description: description
         });
     }
     

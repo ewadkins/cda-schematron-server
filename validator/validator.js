@@ -1,5 +1,8 @@
 // jshint node:true
 // jshint shadow:true
+
+module.exports = { validate: validate };
+
 var fs = require('fs');
 var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
@@ -7,25 +10,32 @@ var dom = require('xmldom').DOMParser;
 var parseSchematron = require('./parseSchematron');
 var testAssertion = require('./testAssertion');
 
-module.exports = { validate: validate };
+var parsedMap = {};
 
-function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
+function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetMaxLength) {
+    includeWarnings = includeWarnings === undefined ? true : includeWarnings;
     externalDir = externalDir || './';
     xmlSnippetMaxLength = xmlSnippetMaxLength || 200;
     
-    // If not valid xml, might be file path
-    if (schematron[0] !== '<') {
-        schematron = fs.readFileSync(schematron, 'utf-8').toString();
-    }
-        
     // Load xml doc
     var xmlDoc = new dom().parseFromString(xml);
+        
+    var s = parsedMap[schematronPath];
     
-    // Load schematron doc
-    var schematronDoc = new dom().parseFromString(schematron);
+    // If not already parsed
+    if (!s) {
+        // Load schematron doc
+        var schematron = fs.readFileSync(schematronPath, 'utf-8').toString();
+        var schematronDoc = new dom().parseFromString(schematron);
+
+        // Parse schematron
+        var s = parseSchematron(schematronDoc);
+
+        // Saved parsed schematron for this schematron file path
+        parsedMap[schematronPath] = s;
+    }
     
-    // Parse schematron
-    var s = parseSchematron(schematronDoc);
+    // Extract data from parsed schematron object
     var namespaceMap = s.namespaceMap;
     var patternLevelMap = s.patternLevelMap;
     var patternRuleMap = s.patternRuleMap;
@@ -40,7 +50,6 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
     for (var pattern in patternRuleMap) {
         if (patternRuleMap.hasOwnProperty(pattern)) {
             var patternId = pattern;
-            var type = patternLevelMap[pattern] || null;
             var rules = patternRuleMap[pattern];
             for (var i = 0; i < rules.length; i++) {
                 if (!ruleAssertionMap[rules[i]].abstract) {
@@ -48,14 +57,11 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
                     var context = ruleAssertionMap[rules[i]].context;
                     var assertionResults = checkRule(rules[i]);                    
                     for (var j = 0; j < assertionResults.length; j++) {
+                        var type = assertionResults[j].type;
                         var assertionId = assertionResults[j].assertionId;
                         var test = assertionResults[j].test;
                         var description = assertionResults[j].description;
                         var typeOverride = null;
-                        if (type === 'warning' && description.indexOf('SHALL') !== -1
-                            && (description.indexOf('SHOULD') === -1 || description.indexOf('SHALL') < description.indexOf('SHOULD'))) {
-                            typeOverride = 'error';
-                        }
                         var results = assertionResults[j].results;
                         if (!results.ignored) {
                             for (var k = 0; k < results.length; k++) {
@@ -66,7 +72,7 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
                                 var modifiedTest = results[k].modifiedTest;
                                 if (!result) {
                                     var obj = {
-                                        type: typeOverride || type,
+                                        type: type,
                                         test: test,
                                         modifiedTest: modifiedTest,
                                         description: description,
@@ -106,6 +112,10 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
         }
     }
     
+    console.log('Errors: ' + errors.length);
+    console.log('Warnings: ' + warnings.length);
+    console.log('Ignored: ' + ignored.length);
+    
     return {
         errors: errors,
         warnings: warnings,
@@ -118,12 +128,16 @@ function validate(xml, schematron, externalDir, xmlSnippetMaxLength) {
         var context = contextOverride || ruleAssertionMap[rule].context;
         for (var i = 0; i < assertionsAndExtensions.length; i++) {
             if (assertionsAndExtensions[i].type === 'assertion') {
-                results.push({
-                    assertionId: assertionsAndExtensions[i].id,
-                    test: assertionsAndExtensions[i].test,
-                    description: assertionsAndExtensions[i].description,
-                    results: testAssertion(assertionsAndExtensions[i].test, context, select, xmlDoc, externalDir, xmlSnippetMaxLength)
-                });
+                var type = assertionsAndExtensions[i].level;
+                if (type === 'error' || includeWarnings) {
+                    results.push({
+                        type: type,
+                        assertionId: assertionsAndExtensions[i].id,
+                        test: assertionsAndExtensions[i].test,
+                        description: assertionsAndExtensions[i].description,
+                        results: testAssertion(assertionsAndExtensions[i].test, context, select, xmlDoc, externalDir, xmlSnippetMaxLength)
+                    });
+                }
             }
             else {
                 results = results.concat(checkRule(assertionsAndExtensions[i].rule, context));
