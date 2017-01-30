@@ -72,7 +72,6 @@ function extract(doc) {
     
     return {
         namespaceMap: namespaceMap,
-        patternLevelMap: patternLevelMap,
         patternRuleMap: patternRuleMap,
         ruleAssertionMap: ruleAssertionMap
     };

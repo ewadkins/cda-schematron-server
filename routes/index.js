@@ -7,8 +7,8 @@ var path = require('path');
 var config = require('../config');
 var validator = require('../validator/validator');
 
-// Load schematron once at start
-var schematronPath = path.join(config.server.appDirectory,
+// Load schematron once at start, using path in arguments or in config
+var schematronPath = process.argv[2] || path.join(config.server.appDirectory,
                                config.validator.baseDirectory,
                                config.validator.schematronFileName);
 var includeWarnings = config.validator.includeWarnings;

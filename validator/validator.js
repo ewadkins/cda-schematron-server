@@ -41,7 +41,6 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
     
     // Extract data from parsed schematron object
     var namespaceMap = s.namespaceMap;
-    var patternLevelMap = s.patternLevelMap;
     var patternRuleMap = s.patternRuleMap;
     var ruleAssertionMap = s.ruleAssertionMap;
         
@@ -65,7 +64,6 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
                         var assertionId = assertionResults[j].assertionId;
                         var test = assertionResults[j].test;
                         var description = assertionResults[j].description;
-                        var typeOverride = null;
                         var results = assertionResults[j].results;
                         if (!results.ignored) {
                             for (var k = 0; k < results.length; k++) {
@@ -98,7 +96,7 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
                             }
                         }
                         else {
-                            var obj = {
+                            var obj2 = {
                                 errorMessage: results.errorMessage,
                                 type: type,
                                 test: test,
@@ -108,7 +106,7 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
                                 assertionId: assertionId,
                                 context: context
                             };
-                            ignored.push(obj);
+                            ignored.push(obj2);
                         }
                     }
                 }
