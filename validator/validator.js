@@ -126,6 +126,19 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
         var results = [];
         var assertionsAndExtensions = ruleAssertionMap[rule].assertionsAndExtensions;
         var context = contextOverride || ruleAssertionMap[rule].context;
+        
+        // Determine the sections within context
+        var selected = [];
+        if (context) {
+            if (context.indexOf('/')) {
+                context = '//' + context;
+            }
+            selected = select(context, xmlDoc);
+        }
+        else {
+            selected = [xmlDoc];
+        }
+        
         for (var i = 0; i < assertionsAndExtensions.length; i++) {
             if (assertionsAndExtensions[i].type === 'assertion') {
                 var type = assertionsAndExtensions[i].level;
@@ -135,7 +148,7 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
                         assertionId: assertionsAndExtensions[i].id,
                         test: assertionsAndExtensions[i].test,
                         description: assertionsAndExtensions[i].description,
-                        results: testAssertion(assertionsAndExtensions[i].test, context, select, xmlDoc, externalDir, xmlSnippetMaxLength)
+                        results: testAssertion(assertionsAndExtensions[i].test, selected, select, xmlDoc, externalDir, xmlSnippetMaxLength)
                     });
                 }
             }

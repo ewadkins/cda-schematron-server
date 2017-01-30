@@ -4,20 +4,8 @@ module.exports = testAssertion;
 
 var includeExternalDocument = require('./includeExternalDocument');
 
-function testAssertion(test, context, select, xmlDoc, externalDir, xmlSnippetMaxLength) {
+function testAssertion(test, selected, select, xmlDoc, externalDir, xmlSnippetMaxLength) {
     var results = [];
-    
-    // Determine the sections within context
-    var selected = [];
-    if (context) {
-        if (context.indexOf('/')) {
-            context = '//' + context;
-        }
-        selected = select(context, xmlDoc);
-    }
-    else {
-        selected = [xmlDoc];
-    }
     
     // Extract values from external document and modify test if a document call is made
     var originalTest = test;
