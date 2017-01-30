@@ -10,9 +10,13 @@ var dom = require('xmldom').DOMParser;
 var parseSchematron = require('./parseSchematron');
 var testAssertion = require('./testAssertion');
 
+// Parsed object "cache"
 var parsedMap = {};
 
 function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetMaxLength) {
+    // Context "cache"
+    var contextMap = {};
+    
     includeWarnings = includeWarnings === undefined ? true : includeWarnings;
     externalDir = externalDir || './';
     xmlSnippetMaxLength = xmlSnippetMaxLength || 200;
@@ -127,17 +131,21 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
         var assertionsAndExtensions = ruleAssertionMap[rule].assertionsAndExtensions;
         var context = contextOverride || ruleAssertionMap[rule].context;
         
-        // Determine the sections within context
-        var selected = [];
-        if (context) {
-            if (context.indexOf('/')) {
-                context = '//' + context;
+        // Determine the sections within context, load selected section from "cache" if possible
+        var selected = contextMap[context];
+        if (!selected) {
+            if (context) {
+                if (context.indexOf('/')) {
+                    context = '//' + context;
+                }
+                selected = select(context, xmlDoc);
             }
-            selected = select(context, xmlDoc);
+            else {
+                selected = [xmlDoc];
+            }
+            contextMap[context] = selected;
         }
-        else {
-            selected = [xmlDoc];
-        }
+        
         
         for (var i = 0; i < assertionsAndExtensions.length; i++) {
             if (assertionsAndExtensions[i].type === 'assertion') {
