@@ -22,6 +22,8 @@ module.exports = function(logger){
         var resourceDirectory = path.join(config.server.appDirectory, config.validator.baseDirectory); // Where to look for resource files
         var xmlSnippetMaxLength = config.validator.xmlSnippetMaxLength;
         
+        // Note: xmlSnippetMaxLength can be omitted from the following call to default to the package default of 200
+        
         var results = validator.validate(xml, schematronPath, includeWarnings, resourceDirectory, xmlSnippetMaxLength);
         
         res.json(results);

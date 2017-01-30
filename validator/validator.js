@@ -133,12 +133,13 @@ function validate(xml, schematronPath, includeWarnings, externalDir, xmlSnippetM
         
         // Determine the sections within context, load selected section from "cache" if possible
         var selected = contextMap[context];
+        var contextModified = context;
         if (!selected) {
             if (context) {
                 if (context.indexOf('/')) {
-                    context = '//' + context;
+                    contextModified = '//' + context;
                 }
-                selected = select(context, xmlDoc);
+                selected = select(contextModified, xmlDoc);
             }
             else {
                 selected = [xmlDoc];
