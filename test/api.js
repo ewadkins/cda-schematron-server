@@ -91,7 +91,6 @@ for (var f = 0; f < files.length; f++) {
     describe((f + 1) + '/' + files.length + ' (' + files[f] + ')\n  Validator api should', function() {
         this.timeout(30000);
         var file = files[f];
-        console.log(file);
         var xml = fs.readFileSync(file, 'utf-8').toString();
         var response;
         it('return a JSON object', function(done) {

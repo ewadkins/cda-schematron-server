@@ -14,6 +14,9 @@ module.exports = function (grunt) {
                     'validator/**/*.js',
                     'test/**/*.js',
                 ]
+            },
+            gruntfile: {
+                src: 'Gruntfile.js'
             }
         },
         mochaTest: {
