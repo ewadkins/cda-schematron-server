@@ -1,9 +1,62 @@
 // jshint node:true
+var http = require('http');
+var fs = require('fs');
 var config = require('./config');
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
-var fs = require('fs');
+
+var app;
+var server;
+var port;
+var logger;
+
+var temp = create();
+app = temp[0];
+logger = temp[1];
+
+port = config.server.port;
+app.set('port', port);
+
+server = http.createServer(app);
+logger.info('HTTP server listening on port %s', port);
+
+console.log('========================================');
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string' ?
+        'Pipe ' + port :
+        'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            logger.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            logger.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
 
 function create() {
 
@@ -77,5 +130,3 @@ function create() {
 	return [app, logger];
 
 }
-
-module.exports = create;

@@ -7,9 +7,7 @@
     "express": "^4.14.0",
     "body-parser": "^1.16.0",
     "morgan": "^1.7.0",
-    "winston": "^2.3.1",
-    "xpath": "^0.0.23",
-    "xmldom": "^0.1.27"
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -21,8 +19,8 @@
     "supertest": "^2.0.1"
   },
   "scripts": {
-    "start": "node startServer",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app",
+    "test": "grunt"
   },
   "repository": {
     "type": "git",
