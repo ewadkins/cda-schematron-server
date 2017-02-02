@@ -4,8 +4,9 @@
   "description": "A server wrapper for C-CDA schematron validation in Node.js",
   "main": "startServer.js",
   "dependencies": {
-    "express": "^4.14.0",
     "body-parser": "^1.16.0",
+    "cda-schematron": "^1.0.0",
+    "express": "^4.14.0",
     "morgan": "^1.7.0",
     "winston": "^2.3.1"
   },
