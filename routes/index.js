@@ -12,24 +12,19 @@ var baseDirectory = path.join(config.server.appDirectory, config.validator.baseD
 
 // Load schematron once at start, using path in arguments or in config
 var schematron = null;
-if (process.argv[2]) {
-    schematron = fs.readFileSync(process.argv[2], 'utf-8').toString();
+var contents = fs.readdirSync(baseDirectory);
+for (var i = 0; i < contents.length; i++) {
+    if (contents[i].slice(-4) === '.sch') {
+        schematron = fs.readFileSync(path.join(baseDirectory, contents[i]), 'utf-8').toString();
+        console.log('Using ' + contents[i]);
+        break;
+    }
 }
-else {
-    var contents = fs.readdirSync(baseDirectory);
-    for (var i = 0; i < contents.length; i++) {
-        if (contents[i].slice(-4) === '.sch') {
-            schematron = fs.readFileSync(path.join(baseDirectory, contents[i]), 'utf-8').toString();
-            console.log('Using ' + contents[i]);
-            break;
-        }
-    }
-    if (!schematron) {
-        console.log('\nERROR: A schematron (.sch) could not be found in the following directory:');
-        console.log(baseDirectory);
-        console.log('\nPlease add one and try again.\n');
-        process.exit();
-    }
+if (!schematron) {
+    console.log('\nERROR: A schematron (.sch) could not be found in the following directory:');
+    console.log(baseDirectory);
+    console.log('\nPlease add one and try again.\n');
+    process.exit();
 }
 
 module.exports = function(logger){

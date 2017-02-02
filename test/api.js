@@ -7,10 +7,6 @@ var expect = require('chai').expect;
 
 var config = require('../config');
 
-// Which schematron to test against
-var schematronFileName = 'C-CDA_Schematron_1.1.sch';
-var schematronPath = path.join(config.server.appDirectory, config.validator.baseDirectory, schematronFileName);
-
 // URL of server
 var url = 'http://localhost:' + config.server.port;
 
@@ -21,9 +17,9 @@ function cleanup() { // Kills the server
 }
 
 describe('Server should', function() {
-    this.timeout(10000);
+    this.timeout(1500);
     it('startup', function(done) {
-        server = child_process.spawn('node', ['app', schematronPath]);
+        server = child_process.spawn('node', ['app']);
         setTimeout(function() {
             request(url)
                 .post('/')
@@ -40,11 +36,11 @@ describe('Server should', function() {
                         done();
                     }
                 });
-        }, 1500);
+        }, 200);
     });
 });
 describe('Validator api should', function() {
-    this.timeout(10000);
+    this.timeout(1000);
     var response;
     it('return a JSON object', function(done) {
         request(url)
