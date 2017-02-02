@@ -2,7 +2,7 @@
   "name": "cda-schematron-server",
   "version": "1.0.0",
   "description": "A server wrapper for C-CDA schematron validation in Node.js",
-  "main": "startServer.js",
+  "main": "app.js",
   "dependencies": {
     "body-parser": "^1.16.0",
     "cda-schematron": "^1.0.0",
