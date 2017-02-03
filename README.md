@@ -18,7 +18,7 @@ node app
 You should see a message asking you to add a schematron file to a certain directory. Example:
 ```
 ERROR: A schematron file (.sch) could not be found in the following directory:
-/Users/<some path>/cda-schematron-server/schematron
+/<some path>/cda-schematron-server/schematron
 
 Please add one and try again.
 ```
